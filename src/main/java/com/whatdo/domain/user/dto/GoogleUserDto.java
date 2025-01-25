@@ -1,4 +1,4 @@
-package com.whatdo.domain.user.model;
+package com.whatdo.domain.user.dto;
 
 import lombok.Builder;
 import lombok.Getter;

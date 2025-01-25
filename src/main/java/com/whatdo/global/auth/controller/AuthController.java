@@ -6,7 +6,7 @@ import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.common.io.BaseEncoding;
-import com.whatdo.domain.user.model.GoogleUserDto;
+import com.whatdo.domain.user.dto.GoogleUserDto;
 import com.whatdo.domain.user.service.UserService;
 import com.whatdo.global.auth.IdTokenDto;
 import com.whatdo.global.auth.RefreshTokenResDto;

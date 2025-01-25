@@ -1,10 +1,13 @@
 package com.whatdo.domain.user.model;
 
 import io.hypersistence.utils.hibernate.id.Tsid;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -35,6 +38,9 @@ public class Users {
 
     private String subjectId;
 
+    @ElementCollection
+    private List<String> interests;
+
     @Builder
     public Users(String email, String nickname, String profileImgUrl, String description, Role role,
         Provider provider, String subjectId) {
@@ -45,5 +51,10 @@ public class Users {
         this.role = role;
         this.provider = provider;
         this.subjectId = subjectId;
+        this.interests = new ArrayList<>();
+    }
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
     }
 }

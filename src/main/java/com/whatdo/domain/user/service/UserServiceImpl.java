@@ -1,6 +1,6 @@
 package com.whatdo.domain.user.service;
 
-import com.whatdo.domain.user.model.GoogleUserDto;
+import com.whatdo.domain.user.dto.GoogleUserDto;
 import com.whatdo.domain.user.model.Provider;
 import com.whatdo.domain.user.model.Role;
 import com.whatdo.domain.user.model.Users;
@@ -8,6 +8,7 @@ import com.whatdo.domain.user.repository.UserRepository;
 import com.whatdo.global.config.ClientConfig;
 import com.whatdo.global.security.jwt.JwtTokenProvider;
 import com.whatdo.global.security.jwt.TokenResponseDto;
+import com.whatdo.global.security.jwt.TokenUtils;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +29,15 @@ public class UserServiceImpl implements UserService {
 
         Users user = optionalUser.orElseGet(() -> createNewGoogleUser(userDto));
         return generateTokenResponse(user.getId());
+    }
+
+    @Override
+    public void updateNickname(String nickname, String token) {
+
+        Users user = userRepository.findById(TokenUtils.getUserIdFromToken(token))
+            .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        user.updateNickname(nickname);
     }
 
     private Users createNewGoogleUser(GoogleUserDto userDto) {

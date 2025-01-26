@@ -1,6 +1,8 @@
 package com.whatdo.domain.meet.service;
 
 import com.whatdo.domain.meet.dto.CreateMeetReqDto;
+import com.whatdo.domain.meet.dto.HashtagDto;
+import com.whatdo.domain.meet.dto.MeetListResDto;
 import com.whatdo.domain.meet.model.Hashtag;
 import com.whatdo.domain.meet.model.Meet;
 import com.whatdo.domain.meet.repository.HashtagRepository;
@@ -11,6 +13,7 @@ import com.whatdo.domain.user.repository.UserRepository;
 import com.whatdo.global.security.jwt.TokenUtils;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,12 +24,14 @@ public class MeetServiceImpl implements MeetService {
     private final MeetRepository meetRepository;
     private final UserRepository userRepository;
     private final HashtagRepository hashtagRepository;
+    private final HashtagService hashtagService;
 
     public MeetServiceImpl(MeetRepository meetRepository, UserRepository userRepository,
-        HashtagRepository hashtagRepository) {
+        HashtagRepository hashtagRepository, HashtagService hashtagService) {
         this.meetRepository = meetRepository;
         this.userRepository = userRepository;
         this.hashtagRepository = hashtagRepository;
+        this.hashtagService = hashtagService;
     }
 
     @Override
@@ -69,5 +74,32 @@ public class MeetServiceImpl implements MeetService {
         meetRepository.save(meet);
 
         return meet.getId();
+    }
+
+    @Override
+    public List<MeetListResDto> getMeetList() {
+        List<Meet> meets = meetRepository.findAll();
+
+        return meets.stream()
+            .map(meet -> {
+                String hostNickname = userRepository.findById(meet.getHostId())
+                    .map(Users::getNickname)
+                    .orElse("Unknown");
+
+                List<HashtagDto> hashtags = hashtagService.getHashtagsById(meet.getHashtagIds());
+
+                return MeetListResDto.builder()
+                    .meetId(meet.getId())
+                    .title(meet.getTitle())
+                    .hostId(meet.getHostId())
+                    .hostNickname(hostNickname)
+                    .hashtags(hashtags)
+                    .maxParticipants(meet.getMaxParticipants())
+                    .participants(meet.getParticipantIds().size())
+                    .isOpen(meet.isOpen())
+                    .createdAt(meet.getCreatedAt())
+                    .build();
+
+            }).collect(Collectors.toList());
     }
 }
